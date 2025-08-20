@@ -8,4 +8,5 @@ public class Restaurant
     public required string Location { get; set; }
 
     public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

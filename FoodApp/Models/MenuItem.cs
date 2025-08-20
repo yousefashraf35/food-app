@@ -1,5 +1,9 @@
 public class MenuItem
 {
+    public ICollection<OrderItem> OrderItems { get; set; }= new List<OrderItem>();
+    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+
+
     public int Id { get; set; }
     public required string Name { get; set; }
     public required string Description { get; set; }
