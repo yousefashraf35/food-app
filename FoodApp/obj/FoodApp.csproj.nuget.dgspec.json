@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "D:\\PROGRAMING\\orange intern\\FoodApp\\FoodApp\\FoodApp.csproj": {}
+    "D:\\PROGRAMING\\orange intern\\Foodapp\\FoodApp\\FoodApp.csproj": {}
   },
   "projects": {
-    "D:\\PROGRAMING\\orange intern\\FoodApp\\FoodApp\\FoodApp.csproj": {
+    "D:\\PROGRAMING\\orange intern\\Foodapp\\FoodApp\\FoodApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PROGRAMING\\orange intern\\FoodApp\\FoodApp\\FoodApp.csproj",
+        "projectUniqueName": "D:\\PROGRAMING\\orange intern\\Foodapp\\FoodApp\\FoodApp.csproj",
         "projectName": "FoodApp",
-        "projectPath": "D:\\PROGRAMING\\orange intern\\FoodApp\\FoodApp\\FoodApp.csproj",
+        "projectPath": "D:\\PROGRAMING\\orange intern\\Foodapp\\FoodApp\\FoodApp.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
         "outputPath": "D:\\PROGRAMING\\orange intern\\FoodApp\\FoodApp\\obj\\",
         "projectStyle": "PackageReference",
