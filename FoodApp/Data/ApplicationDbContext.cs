@@ -40,56 +40,62 @@ namespace FoodApp.Data
                 .WithOne(mi => mi.Category)
                 .HasForeignKey(mi => mi.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade); // optional: cascade delete menu items if category deleted
+                
             builder.Entity<Order>()
                 .HasOne(o => o.ApplicationUser)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if user deleted
+
             builder.Entity<Order>()
                 .HasOne(o => o.DeliveryAddress)
                 .WithMany(a => a.Orders)
                 .HasForeignKey(o => o.AddressId)
                 .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if address deleted
+
             builder.Entity<Order>()
                 .HasOne(o => o.Restaurant)
                 .WithMany(r => r.Orders)
                 .HasForeignKey(o => o.RestaurantId)
-                .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if restaurant deleted    
+                .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if restaurant deleted  
+
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.MenuItem)
                 .WithMany(mi => mi.OrderItems)
                 .HasForeignKey(oi => oi.MenuItemId);
+
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.Order)
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderId);
+
             builder.Entity<CartItem>()
                 .HasOne(ci => ci.MenuItem)
                 .WithMany(mi => mi.CartItems)
                 .HasForeignKey(ci => ci.MenuItemId);
+
             builder.Entity<CartItem>()
                 .HasOne(ci => ci.ApplicationUser)
                 .WithMany(u => u.CartItems)
                 .HasForeignKey(ci => ci.ApplicationUserId);
+
             builder.Entity<CreditCard>()
                 .HasOne(cc => cc.ApplicationUser)
                 .WithMany(u => u.CreditCards)
                 .HasForeignKey(cc => cc.ApplicationUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Payment>()
                 .HasOne(p => p.CreditCard)
                 .WithMany(o => o.Payments)
                 .HasForeignKey(p => p.CardId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Payment>()
                 .HasOne(p => p.Order)
                 .WithOne(o => o.Payment)
                 .HasForeignKey<Payment>(p => p.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-
-        
-
-        
     }
 }
