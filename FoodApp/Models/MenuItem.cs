@@ -9,7 +9,7 @@ public class MenuItem
     public required double Price { get; set; }
     public bool IsAvailable { get; set; } = true;
     
-    public required int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
     public Category? Category { get; set; }
     public required int RestaurantId { get; set; }
     public required Restaurant Restaurant { get; set; }

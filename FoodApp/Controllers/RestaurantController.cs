@@ -1,3 +1,4 @@
+using FoodApp.DTOs.MenuItems;
 using FoodApp.DTOs.Restaurants;
 using FoodApp.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -57,7 +58,30 @@ namespace FoodApp.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
-            } 
+            }
+        }
+
+        [HttpPost("{restaurantId}/menuitems")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> AddMenuItemToRestaurant(int restaurantId, [FromBody] MenuItemCreationDto dto)
+        {
+            try
+            {
+                var menuItem = await _restaurantService.AddMenuItemToRestaurantAsync(restaurantId, dto);
+                return Ok(menuItem);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("{restaurantId}/menuitems")]
+        [Authorize(Roles = "Customer, Manager")]
+        public async Task<IActionResult> GetAllMenuItems(int restaurantId)
+        {
+            var menuItems = await _restaurantService.GetAllMenuItems(restaurantId);
+            return Ok(menuItems);
         }
     }
 }
