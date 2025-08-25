@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+namespace FoodApp.DTOs.Restaurants;
 
 public class UserRequestDto
 {
