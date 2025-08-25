@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 namespace FoodApp.Controllers
 {
     [ApiController]
@@ -21,11 +25,12 @@ namespace FoodApp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserCreationDto dto)
         {
+            // check if user already exists
             var userExists = await _userManager.FindByEmailAsync(dto.Email);
             if (userExists != null)
                 return Conflict("User already exists");
 
-            var user = new ApplicationUser{UserName = dto.Email, Email = dto.Email, EmailConfirmed = true};
+            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, EmailConfirmed = true };
             var result = await _userManager.CreateAsync(user, dto.Password);
 
             if (!result.Succeeded)
@@ -37,6 +42,47 @@ namespace FoodApp.Controllers
 
             await _userManager.AddToRoleAsync(user, requestedRole);
             return Created();
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserRequestDto dto)
+        {   
+            // validate credentials
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+                return Unauthorized("Invalid credentials!");
+
+            // get user role
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.First();
+
+            // add claims to the token
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            var response = new UserResponseDto
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                Role = role,
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                Expiration = token.ValidTo
+            };
+            return Ok(response);
         }
     }
 }
