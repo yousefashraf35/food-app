@@ -5,21 +5,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Order
 {
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    public Payment Payment { get; set; }
+    public Payment? Payment { get; set; }
 
     [Key]
     public int OrderId { get; set; } // PK
     public DateTime CreatedAt { get; set; } // created_at
-    public decimal TotalAmount { get; set; }
-    public string Status { get; set; }
+    public double TotalAmount { get; set; }
+    public string Status { get; set; } = "Pending";
 
     // FK: ApplicationUser
-    public string ApplicationUserId { get; set; }
-    public ApplicationUser ApplicationUser { get; set; }
+    public required string ApplicationUserId { get; set; }
+    public required ApplicationUser ApplicationUser { get; set; }
     // FK: Address
-    public int AddressId { get; set; }
-    public Address DeliveryAddress { get; set; }
+    public required int AddressId { get; set; }
+    public required Address DeliveryAddress { get; set; }
     // FK: Restaurant
-    public int RestaurantId { get; set; }
-    public Restaurant Restaurant { get; set; }
+    public required int RestaurantId { get; set; }
+    public required Restaurant Restaurant { get; set; }
 }

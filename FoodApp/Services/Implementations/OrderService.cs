@@ -16,26 +16,74 @@ namespace FoodApp.Services.Implementations
         }
         public async Task<OrderDto> CreateOrderAsync(CreateOrderDto dto)
         {
+            if (dto.Address == null)
+                throw new ArgumentNullException(nameof(dto.Address), "Address cannot be null.");
+
+            // Check if address exists
+            var address = await _context.Addresses
+                .FirstOrDefaultAsync(a =>
+                    a.Building == dto.Address.Building &&
+                    a.Street == dto.Address.Street &&
+                    a.City == dto.Address.City &&
+                    a.Floor == dto.Address.Floor);
+
+            if (address == null)
+            {
+                // Create new address
+                address = new Address
+                {
+                    Building = dto.Address.Building,
+                    Street = dto.Address.Street,
+                    City = dto.Address.City,
+                    Floor = dto.Address.Floor
+                };
+
+                _context.Addresses.Add(address);
+                await _context.SaveChangesAsync();
+            }
+
+            var applicationUser = await _context.Users.FindAsync(dto.ApplicationUserId);
+            var restaurant = await _context.Restaurants.FindAsync(dto.RestaurantId);
+            var deliveryAddress = address;
+
+            if (applicationUser == null)
+                throw new InvalidOperationException("Invalid user.");
+            if (restaurant == null)
+                throw new InvalidOperationException("Invalid restaurant.");
+
+            // Create the order
             var order = new Order
             {
                 ApplicationUserId = dto.ApplicationUserId,
+                ApplicationUser = applicationUser!,
                 RestaurantId = dto.RestaurantId,
-                AddressId = dto.AddressId,
+                Restaurant = restaurant!,
+                AddressId = deliveryAddress.Id,
+                DeliveryAddress = deliveryAddress,
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow,
                 TotalAmount = dto.Items.Sum(item => item.Price * item.Quantity),
-                OrderItems= dto.Items.Select(item => new OrderItem
-                {
-                    MenuItemId = item.MenuItemId,
-                    Quantity = item.Quantity,
-                    Price = item.Price
-                }).ToList()
-                
             };
+
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            return new OrderDto{
+            var Items = dto.Items.Select(item => new OrderItem
+            {
+                MenuItemId = item.MenuItemId,
+                Quantity = item.Quantity,
+                Price = item.Price,
+                OrderId = order.OrderId,
+                Order = order,
+                MenuItem = _context.MenuItems.Find(item.MenuItemId)!
+            }).ToList();
+
+            _context.OrderItems.AddRange(Items);
+            await _context.SaveChangesAsync();
+
+            // Return DTO
+            return new OrderDto
+            {
                 OrderId = order.OrderId,
                 ApplicationUserId = order.ApplicationUserId,
                 RestaurantId = order.RestaurantId,
@@ -51,6 +99,32 @@ namespace FoodApp.Services.Implementations
                 }).ToList()
             };
         }
+
+        public async Task<List<OrderDto>> GetOrdersByRestaurantIdAsync(int restaurantId)
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Where(o => o.RestaurantId == restaurantId)
+                .ToListAsync();
+
+            return orders.Select(o => new OrderDto
+            {
+                OrderId = o.OrderId,
+                ApplicationUserId = o.ApplicationUserId,
+                RestaurantId = o.RestaurantId,
+                AddressId = o.AddressId,
+                Status = o.Status,
+                CreatedAt = o.CreatedAt,
+                TotalAmount = o.TotalAmount,
+                Items = o.OrderItems.Select(oi => new OrderItemDto
+                {
+                    MenuItemId = oi.MenuItemId,
+                    Quantity = oi.Quantity,
+                    Price = oi.Price
+                }).ToList()
+            }).ToList();
+        }
+
         public async Task<List<OrderDto>> GetOrdersByUserIdAsync(string userId)
         {
             var orders = await _context.Orders 
@@ -79,30 +153,6 @@ namespace FoodApp.Services.Implementations
             }).ToList();
         }
 
-        public async Task<List<OrderDto>> GetOrdersByRestaurantIdAsync(int restaurantId)
-        {
-            var orders = await _context.Orders
-                .Include(o => o.OrderItems)
-                .Where(o => o.RestaurantId == restaurantId)
-                .ToListAsync();
-
-            return orders.Select(o => new OrderDto
-            {
-                OrderId = o.OrderId,
-                ApplicationUserId = o.ApplicationUserId,
-                RestaurantId = o.RestaurantId,
-                AddressId = o.AddressId,
-                Status = o.Status,
-                CreatedAt = o.CreatedAt,
-                TotalAmount = o.TotalAmount,
-                Items = o.OrderItems.Select(oi => new OrderItemDto
-                {
-                    MenuItemId = oi.MenuItemId,
-                    Quantity = oi.Quantity,
-                    Price = oi.Price
-                }).ToList()
-            }).ToList();
-        }
         public async Task UpdateOrderStatusAsync(UpdateOrderStatusDto dto)
         {
             var order = await _context.Orders.FindAsync(dto.OrderId);

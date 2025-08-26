@@ -6,11 +6,11 @@ public class OrderItem
     [Key]
     public int OrderItemId { get; set; }
     public int Quantity { get; set; }
-    public decimal Price { get; set; }
+    public double Price { get; set; }
 
-    public int MenuItemId { get; set; }
-    public MenuItem MenuItem { get; set; }
-    public int OrderId { get; set; }
-    public Order Order { get; set; }
+    public required int MenuItemId { get; set; }
+    public required MenuItem MenuItem { get; set; }
+    public required int OrderId { get; set; }
+    public required Order Order { get; set; }
     
 }

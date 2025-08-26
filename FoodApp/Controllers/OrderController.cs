@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FoodApp.DTOs.Orders;
 using FoodApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FoodApp.Controllers
 {
@@ -14,10 +15,10 @@ namespace FoodApp.Controllers
         {
             _orderService = orderService;
         }
-        [HttpGet("test")]
-        public IActionResult Test() => Ok("Order API is working!");
+
         // POST: api/order
         [HttpPost]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
         {
             if (!ModelState.IsValid)
@@ -29,6 +30,7 @@ namespace FoodApp.Controllers
 
         // GET: api/order/user/{userId}
         [HttpGet("user/{userId}")]
+        [Authorize(Roles = "Customer, Manager")]
         public async Task<IActionResult> GetOrdersByUser(string userId)
         {
             var orders = await _orderService.GetOrdersByUserIdAsync(userId);
@@ -40,6 +42,7 @@ namespace FoodApp.Controllers
 
         // GET: api/order/restaurant/{restaurantId}
         [HttpGet("restaurant/{restaurantId}")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetOrdersByRestaurant(int restaurantId)
         {
             var orders = await _orderService.GetOrdersByRestaurantIdAsync(restaurantId);
@@ -51,6 +54,7 @@ namespace FoodApp.Controllers
 
         // PUT: api/order/status
         [HttpPut("status")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderStatusDto dto)
         {
             if (!ModelState.IsValid)

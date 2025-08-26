@@ -10,5 +10,5 @@ public interface IRestaurantService
     Task<RestaurantDto> GetRestaurantByIdAsync(int id);
     Task DeleteRestaurantAsync(int id);
     Task<MenuItemDto> AddMenuItemToRestaurantAsync(int restaurantId, MenuItemCreationDto dto);
-    Task<List<MenuItemDto>> GetAllMenuItems(int restaurantId);
+    Task<List<MenuItemDto>> GetAllRestaurantMenuItems(int restaurantId);
 }

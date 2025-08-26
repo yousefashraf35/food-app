@@ -108,6 +108,7 @@ public class RestaurantService : IRestaurantService
         
         return new MenuItemDto
         {
+            Id = menuItem.Id,
             Name = menuItem.Name,
             Description = menuItem.Description,
             Price = menuItem.Price,
@@ -117,7 +118,7 @@ public class RestaurantService : IRestaurantService
         };
     }
 
-    public async Task<List<MenuItemDto>> GetAllMenuItems(int restaurantId)
+    public async Task<List<MenuItemDto>> GetAllRestaurantMenuItems(int restaurantId)
     {
         return await _context.MenuItems
             .Where(mi => mi.RestaurantId == restaurantId)

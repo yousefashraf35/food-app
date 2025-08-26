@@ -80,7 +80,7 @@ namespace FoodApp.Controllers
         [Authorize(Roles = "Customer, Manager")]
         public async Task<IActionResult> GetAllMenuItems(int restaurantId)
         {
-            var menuItems = await _restaurantService.GetAllMenuItems(restaurantId);
+            var menuItems = await _restaurantService.GetAllRestaurantMenuItems(restaurantId);
             return Ok(menuItems);
         }
     }
