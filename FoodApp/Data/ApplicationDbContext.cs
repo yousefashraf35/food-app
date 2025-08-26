@@ -6,7 +6,7 @@ namespace FoodApp.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {   
 
-         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -23,41 +23,35 @@ namespace FoodApp.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Address>()
-                .HasOne(a => a.ApplicationUser)
-                .WithMany(u => u.Addresses)
-                .HasForeignKey(a => a.ApplicationUserId)
-                .OnDelete(DeleteBehavior.Cascade); // optional: cascade delete addresses if user deleted
-
             builder.Entity<Restaurant>()
                 .HasMany(r => r.MenuItems)
                 .WithOne(mi => mi.Restaurant)
                 .HasForeignKey(mi => mi.RestaurantId)
-                .OnDelete(DeleteBehavior.Cascade); // optional: cascade delete menu items if restaurant deleted
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Category>()
                 .HasMany(c => c.MenuItems)
                 .WithOne(mi => mi.Category)
                 .HasForeignKey(mi => mi.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade); // optional: cascade delete menu items if category deleted
+                .OnDelete(DeleteBehavior.Cascade);
                 
             builder.Entity<Order>()
                 .HasOne(o => o.ApplicationUser)
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.ApplicationUserId)
-                .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if user deleted
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Order>()
                 .HasOne(o => o.DeliveryAddress)
                 .WithMany(a => a.Orders)
                 .HasForeignKey(o => o.AddressId)
-                .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if address deleted
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Order>()
                 .HasOne(o => o.Restaurant)
                 .WithMany(r => r.Orders)
                 .HasForeignKey(o => o.RestaurantId)
-                .OnDelete(DeleteBehavior.Restrict); // optional: cascade delete orders if restaurant deleted  
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.MenuItem)

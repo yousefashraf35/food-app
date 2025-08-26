@@ -6,7 +6,7 @@ namespace FoodApp.Data
     {
         public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { "Admin", "Restaurant", "Customer" };
+            string[] roleNames = { "Admin", "Manager", "Customer" };
 
             foreach (var roleName in roleNames)
             {
